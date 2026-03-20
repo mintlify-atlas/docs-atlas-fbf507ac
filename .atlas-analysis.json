@@ -1,0 +1,82 @@
+{
+  "projectType": "saas",
+  "projectName": "TimeFlow",
+  "projectDescription": "A Material 3 Android app that helps users visualize and track the passage of time across day, week, month, and year with progress bars, home screen widgets, a calendar, tasks, events, and smart notifications.",
+  "theme": "almond",
+  "primaryColor": "#4C662B",
+  "lightColor": "#CDEDA3",
+  "darkColor": "#354E16",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "getting-started/installation",
+              "getting-started/onboarding"
+            ]
+          },
+          {
+            "group": "Core Features",
+            "pages": [
+              "features/progress-tracking",
+              "features/home-screen-widgets",
+              "features/calendar",
+              "features/tasks",
+              "features/events",
+              "features/notifications"
+            ]
+          },
+          {
+            "group": "Architecture",
+            "pages": [
+              "architecture/overview",
+              "architecture/data-layer",
+              "architecture/viewmodel",
+              "architecture/navigation"
+            ]
+          },
+          {
+            "group": "Contributing",
+            "pages": [
+              "contributing/guide",
+              "contributing/faq"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Visual progress bars for day, week, month, and year",
+    "Home screen Glance widgets (day, week, month, year progress)",
+    "Calendar view with week and month modes",
+    "Task management with priority levels (High, Medium, Low) and completion tracking",
+    "Event scheduling with start/end times",
+    "Smart notifications via AlarmManager for tasks and events",
+    "Onboarding flow with permission handling",
+    "Material 3 design with dynamic theming",
+    "Room database persistence with Hilt dependency injection",
+    "Boot-complete receiver to reschedule alarms after reboot"
+  ],
+  "publicApiSurface": [
+    "Tasks(id, name, description, importance, notification, isCompleted, taskTime, createdAt)",
+    "Events(id, name, description, notification, eventNotificationTime, eventStartTime, eventEndTime, createdAt)",
+    "TaskAndEventViewModel.insertTask(tasks: Tasks)",
+    "TaskAndEventViewModel.updateTask(tasks: Tasks)",
+    "TaskAndEventViewModel.deleteTask(tasks: Tasks)",
+    "TaskAndEventViewModel.insertEvent(events: Events)",
+    "TaskAndEventViewModel.updateEvent(events: Events)",
+    "TaskAndEventViewModel.deleteEvent(events: Events)",
+    "TaskAndEventViewModel.getTasksForADate(start: Long, end: Long)",
+    "TaskAndEventViewModel.getAllEventsForADate(start: Long, end: Long)",
+    "TaskAndEventViewModel.scheduleNotification(notificationAlarmManagerModel: NotificationAlarmManagerModel)",
+    "Routes: TimerScreen, CalendarScreen, WelcomeScreen, NotificationScreen, ShowFeaturesScreen, AboutScreen, PrivacyScreen",
+    "YearProgress (GlanceAppWidget)",
+    "WeekProgress (GlanceAppWidget)",
+    "MonthProgress (GlanceAppWidget)"
+  ]
+}
