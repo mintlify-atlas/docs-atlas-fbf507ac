@@ -1,0 +1,118 @@
+---
+title: "Data layer"
+description: "Room databases, entities, DAOs, repositories, and DataStore preferences in TimeFlow."
+---
+
+The data layer is the single source of truth for all tasks, events, and user preferences. It consists of two Room databases, their DAOs and repositories, and a DataStore instance for lightweight preference storage.
+
+<Note>
+All timestamps in TimeFlow — `taskTime`, `createdAt`, `eventStartTime`, `eventEndTime`, and `eventNotificationTime` — are stored as **epoch milliseconds** (`Long`). When querying for a specific date, the app computes the start-of-day and end-of-day epoch values and passes them as a range.
+</Note>
+
+## Room databases
+
+TimeFlow keeps tasks and events in two separate Room databases:
+
+| Class | Database file | Entity |
+|---|---|---|
+| `TaskDatabase` | `task_database` | `Tasks` |
+| `EventDatabase` | `Events` | `Events` |
+
+Separating the databases keeps the schemas independent and makes it straightforward to migrate or export one type of data without affecting the other.
+
+## Entities
+
+### Tasks
+
+```kotlin
+@Entity
+data class Tasks(
+    @PrimaryKey(autoGenerate = true)
+    val id: Long,
+    val name: String,
+    val description: String?,
+    val importance: String,       // "High", "Medium", "Low"
+    val notification: Boolean = false,
+    val isCompleted: Boolean = false,
+    val taskTime: Long?,
+    val createdAt: Long
+)
+```
+
+- `importance` is a free-form string constrained by the UI to `"High"`, `"Medium"`, or `"Low"`.
+- `taskTime` is nullable — tasks without a scheduled time omit it.
+- `notification` drives whether an `AlarmManager` alarm is scheduled when the task is saved.
+
+### Events
+
+```kotlin
+@Entity(tableName = "Events")
+data class Events(
+    @PrimaryKey(autoGenerate = true)
+    val id: Long,
+    val name: String,
+    val description: String,
+    val notification: Boolean = false,
+    val eventNotificationTime: Long,
+    val eventStartTime: Long,
+    val eventEndTime: Long,
+    val createdAt: Long
+)
+```
+
+- `eventNotificationTime` is the epoch millisecond at which the notification alarm fires — it may differ from `eventStartTime`.
+- Unlike tasks, events always have a non-null description and explicit start/end times.
+
+## DAOs
+
+`TaskDao` and `EventDao` expose suspend functions and `Flow`-returning queries:
+
+- **Insert** — `@Insert(onConflict = OnConflictStrategy.REPLACE)`
+- **Update** — `@Update`
+- **Delete** — `@Delete`
+- **Get all** — returns `Flow<List<T>>` so the UI reacts to database changes automatically
+- **Get for date range** — accepts `start: Long` and `end: Long` epoch values and returns matching rows
+
+Date-range queries power both the "today" views and the calendar day detail views.
+
+## Repository pattern
+
+Each DAO is wrapped in a repository that the ViewModel depends on. Repositories are the only entry point to the database from above the data layer.
+
+### TaskRepo
+
+Delegates to `TaskDao` for insert, update, delete, and both date-range queries (`getAllTasksForDate`, `getTasksForToday`).
+
+### EventRepo
+
+Delegates to `EventDao` for insert, update, delete, and date-range queries (`getAllEventsForDate`, `getEventsForToday`).
+
+### DataStoreRepo
+
+Wraps a `DataStore<Preferences>` instance and manages three preference keys:
+
+| Preference | Type | Purpose |
+|---|---|---|
+| Onboarding completed | `Boolean` | Determines start destination on launch |
+| Calendar type | `Int` | Stores the user's chosen calendar view (week or month) |
+| User name | `String` | Displayed on the today screen |
+
+All reads return `Flow<T>` so the ViewModel can collect them as state. Writes are `suspend` functions.
+
+## Dependency injection
+
+`TimeflowModule.kt` provides all data-layer dependencies as Hilt singletons:
+
+```kotlin
+// Hilt provides these automatically to any @Inject constructor
+@Singleton TaskDatabase
+@Singleton EventDatabase
+@Singleton TaskDao        // from TaskDatabase
+@Singleton EventDao       // from EventDatabase
+@Singleton TaskRepo
+@Singleton EventRepo
+@Singleton DataStoreRepo
+@Singleton DataStore<Preferences>
+```
+
+You never instantiate these classes directly — Hilt injects them wherever they are declared as constructor parameters.

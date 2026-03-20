@@ -1,0 +1,77 @@
+---
+title: "Architecture overview"
+description: "How TimeFlow is structured using MVVM, Hilt dependency injection, Room, and Jetpack Compose."
+---
+
+TimeFlow follows the **Model-View-ViewModel (MVVM)** architecture pattern recommended by Google for Android. Data flows in one direction — from the database up through repositories and a shared ViewModel to the Compose UI — keeping each layer testable and independent.
+
+## Architecture layers
+
+<CardGroup cols={2}>
+  <Card title="Data layer" icon="database" href="/architecture/data-layer">
+    Room databases, DAOs, repositories, and DataStore preferences. All persistence and data access lives here.
+  </Card>
+  <Card title="ViewModel" icon="arrows-left-right-to-line" href="/architecture/viewmodel">
+    A single `TaskAndEventViewModel` mediates between the data layer and the UI, exposing `StateFlow` streams and actions.
+  </Card>
+  <Card title="View (Compose UI)" icon="mobile-screen" href="/architecture/navigation">
+    Jetpack Compose screens consume ViewModel state and emit user events. Navigation Compose handles screen transitions.
+  </Card>
+  <Card title="Glance widgets" icon="grid-2">
+    Three Glance-based home screen widgets (year, week, month) run in a separate process and refresh via `AlarmManager`.
+  </Card>
+</CardGroup>
+
+## Data flow
+
+```
+Room DB / DataStore
+       ↓
+  Repository
+       ↓
+ TaskAndEventViewModel  (StateFlow / State)
+       ↓
+ Compose screens  →  user action  →  ViewModel function  →  Repository
+```
+
+The ViewModel holds all mutable state. Screens are stateless — they observe flows and call ViewModel functions in response to user input.
+
+## Package structure
+
+```
+com.dev.timeflow/
+├── Data/           # Entities, DAOs, databases, repositories
+├── Di/             # Hilt application class and module
+├── Managers/       # AlarmManager services, notification receiver, boot receiver
+├── View/           # Compose screens, navigation, widgets, theme, utilities
+└── Viewmodel/      # TaskAndEventViewModel
+```
+
+## Dependency injection with Hilt
+
+TimeFlow uses **Hilt 2.56.2** to wire the dependency graph. `Application.kt` is annotated with `@HiltAndroidApp` and `TimeflowModule.kt` provides:
+
+- Both Room database instances (`TaskDatabase`, `EventDatabase`)
+- DAOs (`TaskDao`, `EventDao`)
+- Repositories (`TaskRepo`, `EventRepo`, `DataStoreRepo`)
+- The `DataStore<Preferences>` instance
+
+`TaskAndEventViewModel` is annotated with `@HiltViewModel` and injected into every Compose screen via `hiltViewModel()`. All screens share a single ViewModel instance scoped to the activity.
+
+## Key libraries
+
+| Library | Version | Role |
+|---|---|---|
+| Room | 2.7.2 | Local SQLite persistence for tasks and events |
+| Hilt | 2.56.2 | Dependency injection across the app |
+| Navigation Compose | 2.9.0 | Type-safe screen navigation |
+| Glance appwidget | — | Composable home screen widgets |
+| kotlinx-serialization-json | 1.8.1 | Type-safe route serialization |
+| kizitonwose calendar compose | 2.7.0 | Week and month calendar UI |
+| AlarmManager | — | Precise alarm-based notifications |
+
+## Build targets
+
+- **compileSdk / targetSdk**: 36
+- **minSdk**: 27 (Android 8.1 Oreo)
+- **versionName**: 1.2.1 (versionCode 5)

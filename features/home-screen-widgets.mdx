@@ -1,0 +1,93 @@
+---
+title: "Home screen widgets"
+description: "Keep your time progress visible at a glance with Glance-powered Android home screen widgets for year, week, and month."
+---
+
+TimeFlow provides three home screen widgets built with **Jetpack Glance**. Each widget lets you see your time progress without opening the app.
+
+## Available widgets
+
+<CardGroup cols={3}>
+  <Card title="Year Progress" icon="calendar-days">
+    Shows the current year number, exact percentage (e.g. "73.5%"), the current day of the year, days remaining in the year, and a progress bar.
+  </Card>
+  <Card title="Month Progress" icon="calendar">
+    Shows how far you are through the current month as a percentage and a visual progress bar.
+  </Card>
+  <Card title="Week Progress" icon="calendar-week">
+    Shows how far you are through the current week as a percentage and a visual progress bar.
+  </Card>
+</CardGroup>
+
+## How to add a widget
+
+<Steps>
+  <Step title="Long-press your home screen">
+    Touch and hold an empty area of your Android home screen until the edit mode appears.
+  </Step>
+  <Step title="Tap Widgets">
+    Select **Widgets** from the bottom menu or the options that appear on screen.
+  </Step>
+  <Step title="Find TimeFlow">
+    Scroll through the widget list or search for **TimeFlow** to find the three available widgets.
+  </Step>
+  <Step title="Drag to your home screen">
+    Long-press the widget you want (**Year Progress**, **Month Progress**, or **Week Progress**) and drag it to the position you want on your home screen.
+  </Step>
+  <Step title="Release to place">
+    Lift your finger to drop the widget into position. The widget activates immediately and shows your current progress.
+  </Step>
+</Steps>
+
+<Note>
+  You can add all three widgets at once if you want a complete at-a-glance view of your year, month, and week progress side by side.
+</Note>
+
+## What the Year Progress widget displays
+
+The **YearProgress** widget (`GlanceAppWidget`) shows the following information:
+
+- **Year number** — the current calendar year (e.g. 2026)
+- **Percentage** — exact progress to one decimal place (e.g. "73.5%")
+- **Current day of year** — which day out of 365/366 today is
+- **Days remaining** — how many days are left until the end of the year
+- **Progress bar** — a visual bar representing the percentage
+
+The Month and Week widgets follow the same layout pattern for their respective time scales.
+
+## Auto-update mechanism
+
+Widgets stay current automatically. TimeFlow uses `WidgetAlarmService` to schedule periodic refresh alarms. When an alarm fires, the corresponding `WidgetAlarmReceiver` triggers a widget update so the displayed values always reflect the current time.
+
+You do not need to open the app for widgets to stay up to date.
+
+## Updates after device reboot
+
+Android cancels pending alarms when a device restarts. TimeFlow handles this automatically via `BootcompleteReceiver`, which listens for the `BOOT_COMPLETED` broadcast and reschedules all widget update alarms as soon as the device finishes booting.
+
+```kotlin
+// BootcompleteReceiver reschedules widget alarms on every device restart
+class BootcompleteReceiver : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+        if (intent.action == Intent.ACTION_BOOT_COMPLETED) {
+            // Restart WidgetAlarmService to reschedule all widget updates
+        }
+    }
+}
+```
+
+<Info>
+  The `RECEIVE_BOOT_COMPLETED` permission is declared in the app manifest so this receiver works without any user action.
+</Info>
+
+## Theming
+
+Widgets use **Jetpack Glance**'s `GlanceTheme`, which reads the system's dynamic Material You color scheme. The progress bars and text use `GlanceTheme.colors.primary`, so the widgets automatically match the wallpaper-derived colors on Android 12 and later.
+
+On older Android versions, the widgets fall back to TimeFlow's static brand colors.
+
+## Widget placement tips
+
+- Place the **Year Progress** widget on your main home screen for a long-term motivational view.
+- Pair the **Week Progress** and **Month Progress** widgets together on a secondary home screen page for a medium-term planning view.
+- Widgets are resizable — stretch them wider to make the progress bar more prominent.

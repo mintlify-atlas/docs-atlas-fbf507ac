@@ -1,0 +1,71 @@
+---
+title: "Introduction"
+description: "TimeFlow is a Material 3 Android app that helps you visualize how time flows across your day, week, month, and year."
+---
+
+TimeFlow gives you a clear, at-a-glance picture of where you are in time. Instead of abstract dates and numbers, you see visual progress bars showing how much of each time period has elapsed — and how much remains.
+
+<Note>
+  TimeFlow requires **Android 8.1 Oreo (API level 27)** or higher (targetSdk 36). Check your Android version in **Settings → About phone → Android version** before installing.
+</Note>
+
+## What TimeFlow does
+
+Time passes whether you track it or not. TimeFlow makes the flow of time tangible by turning each time unit into a living progress bar. You can see that today is 62% complete, the week is nearly done, or that you're already three quarters through the year — all in one view.
+
+Beyond the life bars, TimeFlow layers in a calendar, task management, and event tracking so you can act on what you see, not just observe it.
+
+## Features
+
+<CardGroup cols={2}>
+  <Card title="Progress tracking" icon="chart-bar" href="/features/progress-tracking">
+    Visual progress bars for day, week, month, and year. See exactly how much time remains at a glance.
+  </Card>
+  <Card title="Home screen widgets" icon="grid-2" href="/features/home-screen-widgets">
+    Glance-powered widgets that display your time bars directly on the Android home screen without opening the app.
+  </Card>
+  <Card title="Calendar" icon="calendar" href="/features/calendar">
+    A monthly calendar view integrated with your tasks and events so everything lives in one place.
+  </Card>
+  <Card title="Tasks" icon="circle-check" href="/features/tasks">
+    Create and manage tasks with due dates. Tasks appear alongside your time bars to keep priorities visible.
+  </Card>
+  <Card title="Events" icon="bell" href="/features/events">
+    Schedule events and receive smart reminders. The app uses AlarmManager to fire notifications at the right time.
+  </Card>
+  <Card title="Smart notifications" icon="bell-ring" href="/features/notifications">
+    Context-aware reminders for tasks and events, delivered via Android's notification system.
+  </Card>
+</CardGroup>
+
+## Technical stack
+
+TimeFlow is built entirely with modern Android development tools:
+
+| Technology | Purpose |
+|---|---|
+| **Kotlin** | Primary language |
+| **Jetpack Compose** | Declarative UI framework |
+| **Material 3** | Design system and theming |
+| **Glance** | Home screen widget rendering |
+| **Room** | Local database for tasks and events |
+| **Hilt** | Dependency injection |
+| **AlarmManager** | Scheduling task and event reminders |
+| **DataStore** | Persisting app preferences and onboarding state |
+
+## App details
+
+| Property | Value |
+|---|---|
+| **App ID** | `com.dev.timeflow` |
+| **Current version** | 1.2.1 (versionCode 5) |
+| **Minimum Android** | API 27 (Android 8.1 Oreo) |
+| **Target Android** | API 36 |
+
+## Next steps
+
+Ready to get TimeFlow on your device? Start with installation.
+
+<Card title="Install TimeFlow" icon="download" href="/getting-started/installation">
+  Download the APK from GitHub Releases and install it on your Android device.
+</Card>

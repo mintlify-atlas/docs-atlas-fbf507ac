@@ -1,0 +1,111 @@
+---
+title: "ViewModel"
+description: "How TaskAndEventViewModel manages state, coordinates data access, and drives the Compose UI."
+---
+
+TimeFlow uses a **single shared ViewModel** — `TaskAndEventViewModel` — for every screen. It holds all UI state as `StateFlow` and `State` objects, exposes functions for every user action, and coordinates with repositories and the notification system.
+
+## Constructor
+
+```kotlin
+@HiltViewModel
+class TaskAndEventViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
+    private val eventRepo: EventRepo,
+    private val dataStoreRepo: DataStoreRepo,
+    private val taskRepo: TaskRepo
+) : ViewModel()
+```
+
+Hilt injects all three repositories and the application context. You obtain the ViewModel in any Compose screen with:
+
+```kotlin
+val viewModel: TaskAndEventViewModel = hiltViewModel()
+```
+
+Because it is scoped to the `MainActivity`, every composable that calls `hiltViewModel()` receives the same instance.
+
+## State
+
+### StateFlows
+
+| Property | Type | Description |
+|---|---|---|
+| `allTasks` | `StateFlow<List<Tasks>>` | All tasks from the database |
+| `allEvents` | `StateFlow<List<Events>>` | All events from the database |
+| `taskForToday` | `StateFlow<List<Tasks>>` | Tasks scheduled for the current day |
+| `eventForToday` | `StateFlow<List<Events>>` | Events scheduled for the current day |
+| `taskForDate` | `StateFlow<List<Tasks>>` | Tasks for a selected calendar date |
+| `eventForDate` | `StateFlow<List<Events>>` | Events for a selected calendar date |
+
+`allTasks` and `allEvents` are always active. `taskForDate` and `eventForDate` update only when the user selects a date — the previous query job is cancelled before launching a new one (see [job cancellation](#job-cancellation) below).
+
+### State objects
+
+| Property | Type | Description |
+|---|---|---|
+| `isLoading` | `State<Boolean>` | `true` while the ViewModel initialises |
+| `startDestination` | `State<String>` | Route string used by `Navgraph` on first composition |
+| `isCompleted` | `State<Boolean>` | Whether the user has finished onboarding |
+
+## Initialisation
+
+On creation the ViewModel reads the onboarding preference from `DataStoreRepo`. If onboarding is complete it sets `startDestination` to `TimerScreen.route`; otherwise it sets it to `WelcomeScreen.route`. Once the read finishes, `isLoading` is set to `false` and `Navgraph` renders the correct start screen.
+
+## Task operations
+
+| Function | Description |
+|---|---|
+| `insertTask(tasks: Tasks)` | Inserts a task; schedules an `AlarmManager` alarm if `notification == true` |
+| `updateTask(tasks: Tasks)` | Updates an existing task row |
+| `deleteTask(tasks: Tasks)` | Deletes a task row |
+| `getTasksForADate(start, end)` | Cancels the previous date-query job and launches a new one |
+| `getTasksForToday(start, end)` | Fetches tasks for the current day's epoch range |
+| `selectTask(tasks: Tasks)` | Stores the task the user tapped (used by edit sheets) |
+| `clearTask()` | Clears the selected task |
+
+## Event operations
+
+| Function | Description |
+|---|---|
+| `insertEvent(events: Events)` | Inserts an event; schedules an `AlarmManager` alarm if `notification == true` |
+| `updateEvent(events: Events)` | Updates an existing event row |
+| `deleteEvent(events: Events)` | Deletes an event row |
+| `getAllEventsForADate(start, end)` | Cancels the previous date-query job and launches a new one |
+| `getEventForToday(start, end)` | Fetches events for the current day's epoch range |
+| `selectEvent(events: Events)` | Stores the event the user tapped |
+| `clearEvent()` | Clears the selected event |
+
+## Notification scheduling
+
+```kotlin
+fun scheduleNotification(notificationAlarmManagerModel: NotificationAlarmManagerModel)
+```
+
+`NotificationAlarmManagerModel` carries the alarm parameters:
+
+| Field | Type | Description |
+|---|---|---|
+| `id` | `Int` | Unique alarm ID |
+| `title` | `String` | Notification title |
+| `type` | `Int` | `0` = event, `1` = task |
+| `hour` / `minute` | `Int` | Alarm time |
+| `localDate` | `LocalDate` | Target date |
+| `startTime` / `endTime` | `Long?` | Event times (optional for tasks) |
+
+Internally this delegates to `TimeFlowAlarmManagerService.scheduleSingleAlarm()`, which sets an exact `AlarmManager` alarm. `NotificationAlarmManagerReciever` handles the broadcast when the alarm fires.
+
+## Preference operations
+
+| Function | Description |
+|---|---|
+| `suspend saveOnBoarding()` | Marks onboarding as complete in DataStore |
+| `readOnBoardingState(): Flow<Boolean>` | Emits the current onboarding flag |
+| `suspend saveSelectedCalenderType(type: Int)` | Persists the chosen calendar view |
+| `readCalendarType(): Flow<Int>` | Emits the stored calendar type |
+| `saveName(name: String)` | Saves the user's name |
+| `readName(): Flow<String>` | Emits the stored name |
+
+## Job cancellation
+
+Date-based queries — `getTasksForADate` and `getAllEventsForADate` — run inside `Job` references (`taskJob`, `eventJob`). Each time the user navigates to a different date, the ViewModel cancels the running job before starting a new coroutine. This prevents stale results from a slow previous query from overwriting the current selection.

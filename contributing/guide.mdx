@@ -1,0 +1,140 @@
+---
+title: "Contributing guide"
+description: "How to set up your environment, make changes, and submit a pull request to TimeFlow."
+---
+
+## Prerequisites
+
+Before you start, make sure you have the following installed:
+
+- **Android Studio** (latest stable release)
+- **JDK 11 or higher** (JDK 17 recommended)
+- **Android SDK** with API levels 27–36 installed
+- **Git**
+
+<Note>
+  TimeFlow uses Hilt for dependency injection with KSP (Kotlin Symbol Processing). KSP is already configured in the Gradle build — you do not need to set it up manually.
+</Note>
+
+## Contribution workflow
+
+<Steps>
+
+<Step title="Fork and clone the repository">
+
+Fork the repository on GitHub, then clone your fork locally:
+
+<CodeGroup>
+
+```bash git clone
+git clone https://github.com/dev778g-me/TimeFlow.git
+cd TimeFlow
+```
+
+</CodeGroup>
+
+</Step>
+
+<Step title="Open the project in Android Studio">
+
+Open Android Studio and select **File → Open**, then navigate to the cloned `TimeFlow` directory. Android Studio will detect the Gradle project automatically.
+
+Wait for the initial Gradle sync to complete. If the sync fails, check that your Android SDK includes API 27–36 under **SDK Manager → SDK Platforms**.
+
+</Step>
+
+<Step title="Explore the project structure">
+
+TimeFlow follows an MVVM architecture. The main source tree is at `app/src/main/java/com/dev/timeflow/`:
+
+| Package | Contents |
+|---|---|
+| `Data/` | Room entities, DAOs, repositories, DataStore preferences |
+| `Di/` | Hilt modules and the Application class |
+| `Managers/` | AlarmManager scheduling, widget receivers, notification system |
+| `View/` | Compose screens, widgets, theme, and utility components |
+| `Viewmodel/` | `TaskAndEventViewModel` — shared across all screens |
+
+See the [architecture overview](/architecture/overview) for a deeper explanation of how these layers interact.
+
+</Step>
+
+<Step title="Run the app">
+
+Connect a physical device running Android 8.1 (API 27) or higher, or create an emulator in **AVD Manager** targeting API 27–36.
+
+Click **Run → Run 'app'** in Android Studio, or press `Shift+F10`. The app will build and install on your selected device.
+
+</Step>
+
+<Step title="Create a feature branch">
+
+Never commit directly to `main`. Create a dedicated branch for your change:
+
+```bash
+git checkout -b feature/your-feature-name
+```
+
+Use the `fix/` prefix for bug fixes and `docs/` for documentation changes.
+
+</Step>
+
+<Step title="Make your changes">
+
+Use the table below to find the right place for your change:
+
+| Change type | Where to add it |
+|---|---|
+| New screen | `View/Screens/` — create a new composable file |
+| New data model or entity | `Data/Model/` — add a Room entity and update the DAO |
+| New repository method | `Data/Repository/` — extend the existing repository interface |
+| New ViewModel logic | `Viewmodel/TaskAndEventViewModel.kt` |
+| New widget type | `View/Widget/` — see FAQ for the full widget checklist |
+| New Hilt binding | `Di/` — add or update the relevant Hilt module |
+
+Follow [Kotlin coding conventions](https://kotlinlang.org/docs/coding-conventions.html) and Jetpack Compose best practices throughout:
+
+- Use `remember` and `derivedStateOf` to minimize unnecessary recomposition.
+- Keep composables stateless where possible; pass state down and events up.
+- Name composables with `PascalCase` and preview functions with a `Preview` suffix.
+- Collect `StateFlow` with `collectAsStateWithLifecycle()`, not `collectAsState()`.
+
+</Step>
+
+<Step title="Write a clear commit message">
+
+Use the imperative mood and keep the subject line under 72 characters:
+
+```
+Add recurring task support to TaskAndEventViewModel
+
+- Introduce RecurringTask data class in Data/Model/
+- Update TaskDao with query for recurring entries
+- Expose recurrence state from TaskAndEventViewModel
+```
+
+</Step>
+
+<Step title="Submit a pull request">
+
+Push your branch to your fork and open a pull request against the `main` branch of `dev778g-me/TimeFlow`:
+
+```bash
+git push origin feature/your-feature-name
+```
+
+In your pull request description:
+
+- Summarize what changed and why.
+- Reference any related issues using `Closes #123`.
+- Include a screenshot or screen recording if you changed the UI.
+
+A maintainer will review your PR and may request changes before merging.
+
+</Step>
+
+</Steps>
+
+## Reporting issues
+
+Found a bug or have a feature request? Open an issue at [github.com/dev778g-me/TimeFlow/issues](https://github.com/dev778g-me/TimeFlow/issues). Include your Android version, device model, and steps to reproduce the problem.

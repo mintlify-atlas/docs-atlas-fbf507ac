@@ -1,0 +1,66 @@
+---
+title: "Notifications"
+description: "How TimeFlow uses AlarmManager to deliver precise local notifications for tasks and events."
+---
+
+TimeFlow delivers notifications using Android's **AlarmManager** — not Firebase Cloud Messaging (FCM) or any remote service. All alarms are scheduled and fired locally on your device, which means notifications work offline and fire at the exact time you specify.
+
+## How it works
+
+When you enable a notification on a task or event, TimeFlow creates a `NotificationAlarmManagerModel` and calls `TimeFlowAlarmManagerService.scheduleSingleAlarm()`. AlarmManager fires a broadcast at the specified `hour:minute` on the target date. `NotificationAlarmManagerReciever` handles that broadcast and shows the notification.
+
+### Notification types
+
+| Type value | Applies to |
+|---|---|
+| `0` | Events |
+| `1` | Tasks |
+
+The type is set automatically based on whether you're creating a task or an event — you don't configure it manually.
+
+## Enable notifications on a task
+
+<Steps>
+  <Step title="Open the add or edit sheet">
+    Tap the **FAB** and select **Add Task**, or tap an existing **TaskTile** to open **SheetToEditTask**.
+  </Step>
+  <Step title="Set a scheduled time">
+    Tap the time picker and choose the date and time for the task (`taskTime`). The notification fires at this exact hour and minute.
+  </Step>
+  <Step title="Toggle the notification switch">
+    Enable the **Notification** toggle. TimeFlow will schedule an alarm using the `taskTime` you set.
+  </Step>
+  <Step title="Save">
+    Tap **Save**. The alarm is scheduled immediately via `TimeFlowAlarmManagerService.scheduleSingleAlarm()`.
+  </Step>
+</Steps>
+
+## Enable notifications on an event
+
+When creating or editing an event, toggle the **Notification** switch and set the **Notification time** (`eventNotificationTime`). This time is independent from the event start time — you choose exactly when you want the reminder to fire. See [Events](/features/events) for the full flow.
+
+## Notification timing
+
+- **Tasks:** the alarm fires at the `hour:minute` derived from `taskTime`.
+- **Events:** the alarm fires at the `hour:minute` derived from `eventNotificationTime`, which can differ from `eventStartTime`.
+
+Both are precise to the minute. TimeFlow does not batch or delay alarms.
+
+## Permission requirement
+
+<Warning>
+  Android 13 (API 33) and later require the `POST_NOTIFICATIONS` runtime permission before any notification can be shown. TimeFlow requests this permission during the onboarding flow using the accompanist-permissions library. If you deny the permission during onboarding, notifications will be silently suppressed until you grant it manually in **Settings → Apps → TimeFlow → Notifications**.
+</Warning>
+
+## Alarm persistence after reboot
+
+<Info>
+  AlarmManager alarms are cleared when a device reboots. TimeFlow includes a `BootcompleteReceiver` that listens for the `BOOT_COMPLETED` broadcast and automatically reschedules all pending alarms when your device starts up. You don't need to take any action — your reminders are restored in the background.
+</Info>
+
+## What happens on reboot
+
+1. Device restarts and broadcasts `BOOT_COMPLETED`.
+2. `BootcompleteReceiver` receives the broadcast.
+3. All tasks and events with notifications enabled are re-queried from the local Room database.
+4. Alarms are rescheduled via `TimeFlowAlarmManagerService.scheduleSingleAlarm()` for any notification times that are still in the future.

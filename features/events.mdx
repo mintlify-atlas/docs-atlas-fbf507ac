@@ -1,0 +1,73 @@
+---
+title: "Events"
+description: "Schedule time-bound events in TimeFlow with start and end times and optional notifications."
+---
+
+Events represent scheduled activities with a defined time range. Unlike tasks — which have a single optional scheduled time — every event has both a **start time** and an **end time**. Events are displayed in the calendar view and on the **TodayScreen**, and they support an independent notification time so you can be reminded before the event begins.
+
+## Event fields
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `name` | String | Yes | The event title displayed in the EventTile |
+| `description` | String | Yes | Supporting details about the event |
+| `eventStartTime` | Long (epoch ms) | Yes | When the event begins |
+| `eventEndTime` | Long (epoch ms) | Yes | When the event ends |
+| `notification` | Boolean | No | Whether to fire a notification at `eventNotificationTime` |
+| `eventNotificationTime` | Long (epoch ms) | No | When to send the notification (independent from start time) |
+| `createdAt` | Long (epoch ms) | Yes | Timestamp set automatically when the event is created |
+
+## How events differ from tasks
+
+| | Tasks | Events |
+|---|---|---|
+| Time fields | Single optional `taskTime` | Required `eventStartTime` and `eventEndTime` |
+| Priority levels | High / Medium / Low | None |
+| Completion state | `isCompleted` checkbox | Not applicable |
+| Notification trigger | `taskTime` | `eventNotificationTime` (separate field) |
+
+## Create an event
+
+<Steps>
+  <Step title="Open the add sheet">
+    Tap the **FAB** (floating action button) on any screen, then select **Add Event**. The **SheetToAddTaskAndEvent** bottom sheet opens in event mode.
+  </Step>
+  <Step title="Enter the event name">
+    Type a name in the **Name** field.
+  </Step>
+  <Step title="Add a description">
+    Enter details in the **Description** field.
+  </Step>
+  <Step title="Set the start time">
+    Tap the start time picker and choose the date and time the event begins.
+  </Step>
+  <Step title="Set the end time">
+    Tap the end time picker and choose when the event ends. The end time must be after the start time.
+  </Step>
+  <Step title="Enable a notification (optional)">
+    Toggle the **Notification** switch, then set the **Notification time** — the moment you want to be reminded. This can be any time before (or at) the event start.
+  </Step>
+  <Step title="Save the event">
+    Tap **Save**. The event is inserted into the database via `insertEvent` and appears on the calendar for its scheduled date.
+  </Step>
+</Steps>
+
+<Note>
+  The notification time (`eventNotificationTime`) is completely independent from the event start time (`eventStartTime`). You can schedule a reminder 10 minutes, an hour, or a day before the event — they are stored and managed separately.
+</Note>
+
+## Edit an event
+
+Tap an **EventTile** in the calendar or on the **TodayScreen** to open the **SheetToEditEvent** bottom sheet. Update any field and tap **Save** to persist the changes via `updateEvent`.
+
+## Delete an event
+
+Inside **SheetToEditEvent**, tap **Delete**. The event is removed via `deleteEvent` and is immediately removed from the calendar.
+
+## Viewing events in the calendar
+
+Each event appears as an **EventTile** that displays the event name, start time, and end time. Events are fetched for a given date using `getAllEventsForADate(start, end)` with a midnight-to-midnight epoch range.
+
+## Today's events
+
+The **TodayScreen** includes an **Events** tab that lists all events for the current day, fetched with `getEventForToday(start, end)`. This gives you a quick overview of everything scheduled for today alongside your tasks.

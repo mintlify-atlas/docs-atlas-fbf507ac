@@ -1,0 +1,76 @@
+---
+title: "FAQ"
+description: "Answers to common questions about using and contributing to TimeFlow."
+---
+
+<AccordionGroup>
+
+  <Accordion title="What Android version is required to run TimeFlow?">
+    TimeFlow requires Android 8.1 (API 27) or higher. The app targets API 36 (`targetSdk = 36`), so it runs on all Android versions between 8.1 and the latest stable release.
+  </Accordion>
+
+  <Accordion title="Why doesn't TimeFlow use Firebase or a backend?">
+    TimeFlow is fully offline by design. All data — tasks, events, and preferences — is stored locally using Room (SQLite) and DataStore. No network connection is required to use the app, and no data leaves your device.
+  </Accordion>
+
+  <Accordion title="Why does the app use AlarmManager instead of WorkManager for notifications?">
+    AlarmManager supports exact alarm scheduling, which fires at a precise time. This is critical for task and event reminders where a delay of several minutes is unacceptable. WorkManager uses flexible, battery-optimised timing that the OS can defer — making it unsuitable for time-sensitive notifications.
+  </Accordion>
+
+  <Accordion title="What happens to my notifications when I reboot my phone?">
+    AlarmManager alarms are cleared when the device powers off. TimeFlow registers a `BootCompleteReceiver` that listens for the `BOOT_COMPLETED` broadcast. When the device restarts, this receiver automatically reschedules all pending alarms so no reminders are lost.
+  </Accordion>
+
+  <Accordion title="How do I add a new widget type?">
+    Follow these steps to add a new home screen widget:
+
+    1. Create a new `GlanceAppWidget` subclass in **`View/Widget/`**.
+    2. Create a corresponding `GlanceAppWidgetReceiver` for the widget.
+    3. Register both the widget and receiver in **`AndroidManifest.xml`**.
+    4. Add the widget update logic to **`WidgetAlarmService`** in `Managers/`.
+
+    Look at the existing widget implementation in `View/Widget/` for a reference pattern.
+  </Accordion>
+
+  <Accordion title="How is the ViewModel shared across screens?">
+    TimeFlow uses a single `@HiltViewModel` — `TaskAndEventViewModel` — injected with `hiltViewModel()` in each Compose screen. Hilt scopes the ViewModel to the Activity lifecycle, so state is preserved as you navigate between screens without creating multiple ViewModel instances.
+  </Accordion>
+
+  <Accordion title="Can I add cloud sync or backup?">
+    TimeFlow is currently fully local. Adding cloud sync would require:
+
+    - A remote data source class implementing the same interface as the local Room repository.
+    - An updated Hilt module that binds the remote source when a sync preference is enabled.
+    - UI for authentication and sync settings.
+
+    Contributions in this direction are welcome. Open an issue at [github.com/dev778g-me/TimeFlow/issues](https://github.com/dev778g-me/TimeFlow/issues) to discuss your approach before starting.
+  </Accordion>
+
+  <Accordion title="How do I run the tests?">
+    You can run tests from Android Studio's test runner or from the command line:
+
+    ```bash
+    # Unit tests
+    ./gradlew test
+
+    # Instrumented tests (requires a connected device or emulator)
+    ./gradlew connectedAndroidTest
+    ```
+
+    Unit tests live in `app/src/test/` and instrumented tests in `app/src/androidTest/`.
+  </Accordion>
+
+  <Accordion title="What is the minimum contribution I can make?">
+    Any contribution is welcome. You don't need to write code to contribute. Good starting points include:
+
+    - Reporting a bug with clear reproduction steps.
+    - Suggesting a UI improvement or accessibility fix.
+    - Improving documentation or translations.
+    - Picking up a ticket labelled **good first issue** on the [GitHub Issues page](https://github.com/dev778g-me/TimeFlow/issues).
+  </Accordion>
+
+  <Accordion title="How is the calendar library integrated?">
+    TimeFlow uses [`com.kizitonwose.calendar:compose:2.7.0`](https://github.com/kizitonwose/Calendar) for its calendar views. The week calendar is implemented in **`View/Screens/calenderScreen/weekCalender.kt`** and the month calendar in **`monthCalender.kt`** in the same package. Both composables receive state from `TaskAndEventViewModel`.
+  </Accordion>
+
+</AccordionGroup>

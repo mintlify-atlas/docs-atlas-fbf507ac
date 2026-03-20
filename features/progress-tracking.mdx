@@ -1,0 +1,93 @@
+---
+title: "Progress tracking"
+description: "See exactly how far you are through your day, week, month, and year with animated Material 3 progress bars."
+---
+
+The **Today** screen (routed as `TimerScreen`) is the heart of TimeFlow. It shows the current date prominently and four animated progress bars that tell you exactly how much of each time period has elapsed.
+
+## What the screen shows
+
+At the top of the screen you see today's date displayed as the **month name**, **day number**, and **day of week** — for example, "March 20 Thursday". Below the date, four `ProgressCard` composables stack vertically, one for each time scale. Each card contains a short sentence like:
+
+> "you're 73.5% through the year"
+
+Below the progress cards, a tab row lets you switch between **Tasks** and **Events** for today. The task tab breaks down your items by priority (high, medium, low) so you can see at a glance how much is left.
+
+## The 4 progress bars
+
+<CardGroup cols={2}>
+  <Card title="Day" icon="sun">
+    Tracks how many seconds have elapsed in the current day out of the total seconds in a 24-hour period.
+  </Card>
+  <Card title="Week" icon="calendar-week">
+    Tracks which day of the week you are on, from Monday (day 1) to Sunday (day 7).
+  </Card>
+  <Card title="Month" icon="calendar">
+    Tracks the current day of the month relative to the total number of days in the month.
+  </Card>
+  <Card title="Year" icon="calendar-days">
+    Tracks the current day of the year relative to the total days in the year (365 or 366).
+  </Card>
+</CardGroup>
+
+## Calculation formulas
+
+Each bar is calculated as a percentage using the following formulas from `TodayScreen.kt`:
+
+```kotlin
+// Day progress
+val dayPercent = getDayProgressPercent()
+// Internally: (secondsElapsed / totalSecondsInDay) * 100
+
+// Week progress
+val weekPercent = (dayOfWeek.toFloat() / 7f) * 100
+
+// Month progress
+val monthPercent = (dayOfMonth.toFloat() / maximumDayInMonth.toFloat()) * 100
+
+// Year progress
+val yearPercent = (dayOfTheYear.toFloat() / maximumDayOfYear.toFloat()) * 100
+```
+
+<Note>
+  The day progress is the most granular — it updates in real time using elapsed seconds, not just the current hour.
+</Note>
+
+## Visual design
+
+Each `ProgressCard` uses a Material 3 `LinearProgressIndicator` that animates smoothly as time advances. The progress bar color follows the app's Material You theme by default.
+
+## Red warning state
+
+When a progress value reaches **90% or higher**, the progress bar changes to the Material 3 `errorColor` (red). This gives you an immediate visual signal that you are running low on time for that period.
+
+```kotlin
+val barColor = if (percent >= 90f) MaterialTheme.colorScheme.error
+               else MaterialTheme.colorScheme.primary
+```
+
+<Warning>
+  A red progress bar means you have used 90% or more of that time period. For the day bar, this means less than 2.4 hours remain.
+</Warning>
+
+## Task and event summary
+
+Below the progress bars, two tabs show your agenda for today:
+
+- **Tasks** — lists tasks grouped or counted by priority: high, medium, and low
+- **Events** — lists calendar events scheduled for today
+
+This lets you correlate how much time you have left in the day with what still needs to be done.
+
+## How to interpret the bars
+
+| Bar | 50% means | 90% (red) means |
+|-----|-----------|------------------|
+| Day | Noon | ~21:36 or later |
+| Week | Wednesday evening (day 3.5 of 7) | Saturday morning |
+| Month | Mid-month | Last 3 days of the month |
+| Year | Around July 2 | Around November 24 |
+
+<Tip>
+  Use the year bar as a long-term gut-check. If the year is already 70% gone and your annual goals are only 30% complete, it is time to reprioritize.
+</Tip>

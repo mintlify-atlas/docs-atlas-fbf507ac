@@ -1,0 +1,67 @@
+---
+title: "Onboarding"
+description: "Walk through the first-launch onboarding flow that TimeFlow guides you through before reaching the main screen."
+---
+
+When you open TimeFlow for the first time, the app guides you through a short onboarding sequence. The flow introduces key features, requests notification permission, and then lands you on the main timer screen. Onboarding only runs once — after you complete it, the app goes straight to the timer screen on every subsequent launch.
+
+## Onboarding flow
+
+<Steps>
+  <Step title="Welcome screen">
+    The app opens on the **Welcome screen** (`WelcomeScreen` route). This screen greets you and invites you to start the walkthrough.
+
+    Tap the continue button to proceed.
+  </Step>
+
+  <Step title="Feature highlights">
+    The **Feature highlights screen** (`ShowFeaturesScreen`) walks you through the main capabilities of TimeFlow:
+
+    - Life progress bars for day, week, month, and year
+    - Home screen Glance widgets
+    - Calendar, tasks, and events
+    - Smart notifications
+
+    Swipe or tap through each highlight to see what the app offers.
+  </Step>
+
+  <Step title="Notification permission">
+    The **Notification screen** (`NotificationScreen`) asks you to grant notification permission.
+
+    <Note>
+      Notification permission is required for task and event reminders. TimeFlow uses this permission to alert you when a task is due or an event is about to start. If you skip this step, you can grant the permission later in your device's app settings.
+    </Note>
+
+    Tap **Allow** when Android shows the system permission dialog. If you prefer not to grant it now, tap **Skip** — you can enable notifications at any time from **Settings → Apps → TimeFlow → Permissions**.
+  </Step>
+
+  <Step title="Main timer screen">
+    After you complete onboarding, the app saves your progress to **DataStore** and navigates to the **Timer screen** (`TimerScreen`). This is the main view you'll see on every future launch.
+
+    The Timer screen displays your visual life bars for the current day, week, month, and year.
+  </Step>
+</Steps>
+
+## How onboarding state is saved
+
+TimeFlow uses Jetpack DataStore to persist whether you have completed onboarding. The `TaskAndEventViewModel` reads this state when the app initializes:
+
+- **`readOnBoardingState()`** — checks DataStore to determine whether onboarding is complete.
+- **`saveOnBoarding()`** — writes the completion flag to DataStore after you finish the final onboarding step.
+
+If onboarding is already marked as complete, the app skips directly to the `TimerScreen` without showing any of the onboarding screens.
+
+## Returning to onboarding
+
+Once onboarding is complete, there is no built-in way to replay it from within the app. If you need to reset onboarding (for example, after clearing app data), clearing the app's storage in **Settings → Apps → TimeFlow → Storage → Clear data** will reset the DataStore flag and trigger onboarding again on the next launch.
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Progress tracking" icon="chart-bar" href="/features/progress-tracking">
+    Learn how the day, week, month, and year progress bars work.
+  </Card>
+  <Card title="Tasks and events" icon="circle-check" href="/features/tasks">
+    Start adding tasks and events to make the most of your time tracking.
+  </Card>
+</CardGroup>

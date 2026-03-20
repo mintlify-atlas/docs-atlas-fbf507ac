@@ -1,0 +1,74 @@
+---
+title: "Navigation"
+description: "Type-safe Navigation Compose setup, all routes, and the onboarding flow in TimeFlow."
+---
+
+TimeFlow uses **Navigation Compose 2.9.0** with type-safe routes backed by **kotlinx-serialization**. Each destination is a serializable object in the `Routes` sealed interface, and the start destination is determined at runtime based on whether the user has completed onboarding.
+
+## Routes
+
+Every screen in the app has a corresponding object in `Routes`:
+
+```kotlin
+sealed interface Routes {
+    @Serializable data object TimerScreen : Routes { override val route = "m_timer_screen" }
+    @Serializable data object ShowFeaturesScreen : Routes { override val route = "feature_screen" }
+    @Serializable data object WelcomeScreen : Routes { override val route = "welcome_screen" }
+    @Serializable data object NotificationScreen : Routes { override val route = "notification_screen" }
+    @Serializable data object CalendarScreen : Routes { override val route = "m_new_task_screen" }
+    @Serializable data object PrivacyScreen : Routes { override val route = "privacy_screen" }
+    @Serializable data object AboutScreen : Routes { override val route = "about_screen" }
+}
+```
+
+`@Serializable` on each object lets Navigation Compose encode and decode destinations without stringly-typed string literals at call sites.
+
+## Navigation graph
+
+`Navgraph.kt` sets up the `NavHost` with all destinations. It reads `startDestination` from `TaskAndEventViewModel` — a `State<String>` that is set during ViewModel initialisation — so the first screen rendered is always correct for the user's state.
+
+`BottomNav.kt` renders the bottom navigation bar visible on the main app screens (`TimerScreen`, `CalendarScreen`, `AboutScreen`). It is hidden during onboarding.
+
+## Start destination
+
+| Condition | Start destination |
+|---|---|
+| First launch (onboarding not completed) | `WelcomeScreen` |
+| Returning user (onboarding completed) | `TimerScreen` |
+
+The ViewModel reads the onboarding flag from `DataStoreRepo` on creation. While the read is in progress `isLoading` is `true` and `Navgraph` defers rendering. Once `isLoading` becomes `false`, `startDestination` is set and the `NavHost` is composed.
+
+## Onboarding flow
+
+New users move through three onboarding screens before reaching the main app:
+
+<Steps>
+  <Step title="Welcome screen">
+    `WelcomeScreen` greets the user and introduces TimeFlow. The user enters their name here, which is saved to DataStore via `viewModel.saveName()`.
+  </Step>
+  <Step title="Features screen">
+    `ShowFeaturesScreen` walks through the key features — progress bars, tasks, events, and widgets — so users understand what the app offers before granting any permissions.
+  </Step>
+  <Step title="Notification screen">
+    `NotificationScreen` explains alarm-based notifications and prompts the user to grant the `POST_NOTIFICATIONS` and `SCHEDULE_EXACT_ALARM` permissions required for reminders.
+  </Step>
+  <Step title="Main app">
+    After completing the notification step, `viewModel.saveOnBoarding()` is called, which writes the completed flag to DataStore. Navigation then moves to `TimerScreen`, the main app entry point. On all future launches the app starts here directly.
+  </Step>
+</Steps>
+
+## Screen inventory
+
+| Route object | Route string | File | Notes |
+|---|---|---|---|
+| `TimerScreen` | `m_timer_screen` | `TodayScreen.kt` | Main screen with progress bars |
+| `CalendarScreen` | `m_new_task_screen` | `CalenderScreen.kt` | Week/month calendar with tasks and events |
+| `AboutScreen` | `about_screen` | `AboutScreen.kt` | App info and links |
+| `WelcomeScreen` | `welcome_screen` | `onBoarding/WelcomeScreen.kt` | Onboarding step 1 |
+| `ShowFeaturesScreen` | `feature_screen` | `onBoarding/FeatureScreen.kt` | Onboarding step 2 |
+| `NotificationScreen` | `notification_screen` | `onBoarding/NotificationScreen.kt` | Onboarding step 3 |
+| `PrivacyScreen` | `privacy_screen` | — | Privacy policy |
+
+<Note>
+The `CalendarScreen` route string (`m_new_task_screen`) is a legacy name from an earlier version of the app. The actual screen is the full calendar view, not a task creation screen.
+</Note>

@@ -1,0 +1,80 @@
+---
+title: "Tasks"
+description: "Create, prioritize, and complete tasks in TimeFlow with optional scheduled notifications."
+---
+
+Tasks are individual to-do items you create in TimeFlow. Each task has a name, an optional description, a priority level, and an optional scheduled time with a notification toggle. Tasks are stored locally in Room and are filtered by date so you see only what's relevant for a given day.
+
+## Task fields
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `name` | String | Yes | The task title displayed in the task tile |
+| `description` | String | No | Additional context shown beneath the name |
+| `importance` | String | Yes | Priority level: `"High"`, `"Medium"`, or `"Low"` |
+| `notification` | Boolean | No | Whether to fire a notification at `taskTime` |
+| `taskTime` | Long (epoch ms) | No | Scheduled time for the task and its notification |
+| `isCompleted` | Boolean | No | Completion state, toggled via the checkbox |
+| `createdAt` | Long (epoch ms) | Yes | Timestamp set automatically when the task is created |
+
+## Priority levels
+
+The `importance` field controls how the task's priority badge appears in the **TaskTile**.
+
+<CardGroup cols={3}>
+  <Card title="High" icon="circle-exclamation">
+    Displayed in the primary color at full opacity, bold weight. Use for urgent or critical tasks.
+  </Card>
+  <Card title="Medium" icon="circle-minus">
+    Displayed in the primary color at 80% alpha, semi-bold weight. Use for important but non-urgent tasks.
+  </Card>
+  <Card title="Low" icon="circle">
+    Displayed in the primary color at 60% alpha, normal weight. Use for tasks that can wait.
+  </Card>
+</CardGroup>
+
+## Create a task
+
+<Steps>
+  <Step title="Open the add sheet">
+    Tap the **FAB** (floating action button) on any screen, then select **Add Task**. The **SheetToAddTaskAndEvent** bottom sheet opens.
+  </Step>
+  <Step title="Enter the task name">
+    Type a name in the **Name** field. This is the only required field.
+  </Step>
+  <Step title="Add a description (optional)">
+    Enter additional context in the **Description** field.
+  </Step>
+  <Step title="Set the priority">
+    Choose **High**, **Medium**, or **Low** from the importance selector.
+  </Step>
+  <Step title="Schedule a time (optional)">
+    Tap the time picker to set a `taskTime`. This is the date and time the task is scheduled for.
+  </Step>
+  <Step title="Enable notifications (optional)">
+    Toggle the **Notification** switch. When enabled, TimeFlow schedules an alarm that fires at the `taskTime` you set. A `taskTime` must be set for the notification to work.
+  </Step>
+  <Step title="Save the task">
+    Tap **Save**. The task is inserted into the database and appears in the list for its scheduled date.
+  </Step>
+</Steps>
+
+## Mark a task complete
+
+Tap the **CheckBox** on a **TaskTile** to toggle `isCompleted`. Completed tasks are visually distinguished from pending ones and can be filtered out of the active list.
+
+## Edit a task
+
+Tap anywhere on a **TaskTile** (outside the checkbox) to open the **SheetToEditTask** bottom sheet. Edit any field and tap **Save** to persist the changes via `updateTask`.
+
+## Delete a task
+
+Inside **SheetToEditTask**, tap **Delete**. The task is removed from the database via `deleteTask` and disappears from the list immediately.
+
+## Today's tasks view
+
+The **TodayScreen** shows all tasks for the current day, fetched with `getTasksForToday` using a start/end epoch range for midnight-to-midnight. The screen displays a breakdown of your task count by priority so you can see at a glance how much high-priority work remains.
+
+## Date filtering
+
+All task queries use a `start` and `end` epoch millisecond range — `getTasksForADate(start, end)` — so you can navigate to any date and see only the tasks scheduled for that day.

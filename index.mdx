@@ -1,97 +1,81 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: "TimeFlow"
+description: "Visualize how your time flows — track your day, week, month, and year with elegant progress bars and home screen widgets."
 ---
 
-## Setting up
-
-Get your documentation site up and running in minutes.
-
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
-
-## Make it yours
-
-Design a docs site that looks great and empowers your users.
-
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
+<CardGroup cols={2}>
+  <Card title="Get started" icon="rocket" href="/getting-started/installation">
+    Install TimeFlow and set it up on your Android device in minutes.
   </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
+  <Card title="Progress tracking" icon="chart-line" href="/features/progress-tracking">
+    See exactly how far you are through your day, week, month, and year.
   </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
+  <Card title="Home screen widgets" icon="grid-2" href="/features/home-screen-widgets">
+    Keep your time progress visible at a glance without opening the app.
   </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
+  <Card title="Calendar & tasks" icon="calendar" href="/features/calendar">
+    Schedule events and manage tasks from an intuitive calendar interface.
   </Card>
-</Columns>
+</CardGroup>
 
-## Create beautiful pages
+## What is TimeFlow?
 
-Everything you need to create world-class documentation.
+TimeFlow is a **Material 3** Android application that helps you stay aware of time passing. It shows your progress through the current day, week, month, and year using animated progress bars — giving you a clear, honest view of where you are in time so you can stay intentional and productive.
 
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
-  </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
-  </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
-  </Card>
-</Columns>
+Beyond the progress bars, TimeFlow gives you a full task and event manager with a beautiful calendar view, smart notifications that fire exactly when you need them, and home screen widgets so your time awareness is always just a glance away.
 
-## Need inspiration?
+## Key features
 
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+<CardGroup cols={2}>
+  <Card title="Visual life bars" icon="bars-progress" href="/features/progress-tracking">
+    Animated Material 3 progress bars show your day, week, month, and year progress in real time.
+  </Card>
+  <Card title="Home screen widgets" icon="mobile-screen" href="/features/home-screen-widgets">
+    Glance-powered widgets for year, week, and month progress — no app launch required.
+  </Card>
+  <Card title="Task management" icon="list-check" href="/features/tasks">
+    Create tasks with High, Medium, or Low priority and track completion throughout the day.
+  </Card>
+  <Card title="Event scheduling" icon="calendar-days" href="/features/events">
+    Add life events with start and end times, then view them in a week or month calendar.
+  </Card>
+  <Card title="Smart notifications" icon="bell" href="/features/notifications">
+    Set precise alarm-based reminders for tasks and events so you never miss a deadline.
+  </Card>
+  <Card title="Onboarding flow" icon="hand-wave" href="/getting-started/onboarding">
+    A friendly welcome screen walks you through permissions and widget setup on first launch.
+  </Card>
+</CardGroup>
+
+## Built with
+
+TimeFlow is a native Android app built on the modern Android stack:
+
+- **Kotlin** — the primary language
+- **Jetpack Compose + Material 3** — declarative UI with expressive theming
+- **Jetpack Glance** — composable home screen widgets
+- **Room** — local database for tasks and events
+- **Hilt** — dependency injection
+- **AlarmManager** — precise alarm-based notifications
+- **Jetpack Navigation Compose** — type-safe screen navigation
+
+## Explore the docs
+
+<CardGroup cols={2}>
+  <Card title="Installation" icon="download" href="/getting-started/installation">
+    Download the APK from the latest GitHub release and sideload it onto your device.
+  </Card>
+  <Card title="Onboarding" icon="circle-check" href="/getting-started/onboarding">
+    What to expect on your first launch and how to grant the right permissions.
+  </Card>
+  <Card title="Architecture overview" icon="diagram-project" href="/architecture/overview">
+    Understand the MVVM structure, data flow, and key components.
+  </Card>
+  <Card title="Contributing" icon="code-pull-request" href="/contributing/guide">
+    Learn how to contribute bug fixes and new features to TimeFlow.
+  </Card>
+</CardGroup>
+
+---
+
+**Stay focused. Stay productive. Let your time flow.**
