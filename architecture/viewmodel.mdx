@@ -86,14 +86,14 @@ fun scheduleNotification(notificationAlarmManagerModel: NotificationAlarmManager
 
 | Field | Type | Description |
 |---|---|---|
-| `id` | `Int` | Unique alarm ID |
+| `id` | `Long` | Unique alarm ID |
 | `title` | `String` | Notification title |
 | `type` | `Int` | `0` = event, `1` = task |
 | `hour` / `minute` | `Int` | Alarm time |
 | `localDate` | `LocalDate` | Target date |
 | `startTime` / `endTime` | `Long?` | Event times (optional for tasks) |
 
-Internally this delegates to `TimeFlowAlarmManagerService.scheduleSingleAlarm()`, which sets an exact `AlarmManager` alarm. `NotificationAlarmManagerReciever` handles the broadcast when the alarm fires.
+Internally this delegates to `TimeFlowAlarmManagerService.scheduleSingleAlarm()`, which sets an exact `AlarmManager` alarm. `NotificationAlarmManagerReceiver` handles the broadcast when the alarm fires.
 
 ## Preference operations
 

@@ -27,7 +27,7 @@ sealed interface Routes {
 
 `Navgraph.kt` sets up the `NavHost` with all destinations. It reads `startDestination` from `TaskAndEventViewModel` — a `State<String>` that is set during ViewModel initialisation — so the first screen rendered is always correct for the user's state.
 
-`BottomNav.kt` renders the bottom navigation bar visible on the main app screens (`TimerScreen`, `CalendarScreen`, `AboutScreen`). It is hidden during onboarding.
+`BottomNav.kt` renders the bottom navigation bar visible on the main app screens (`TimerScreen` and `CalendarScreen`). It is hidden during onboarding and on `AboutScreen`.
 
 ## Start destination
 
@@ -67,8 +67,12 @@ New users move through three onboarding screens before reaching the main app:
 | `WelcomeScreen` | `welcome_screen` | `onBoarding/WelcomeScreen.kt` | Onboarding step 1 |
 | `ShowFeaturesScreen` | `feature_screen` | `onBoarding/FeatureScreen.kt` | Onboarding step 2 |
 | `NotificationScreen` | `notification_screen` | `onBoarding/NotificationScreen.kt` | Onboarding step 3 |
-| `PrivacyScreen` | `privacy_screen` | — | Privacy policy |
+| `PrivacyScreen` | `privacy_screen` | — | Defined in `Routes` but not registered in `NavGraph`; privacy policy opens as an external URL |
 
 <Note>
 The `CalendarScreen` route string (`m_new_task_screen`) is a legacy name from an earlier version of the app. The actual screen is the full calendar view, not a task creation screen.
+</Note>
+
+<Note>
+`PrivacyScreen` is defined in the `Routes` sealed interface but is never registered as a composable in `NavGraph`. Instead, the privacy policy link in the top-bar dropdown menu opens `https://timeflow.framer.website/privacypolicy` directly in a browser via an `Intent`.
 </Note>

@@ -63,14 +63,15 @@ You do not need to open the app for widgets to stay up to date.
 
 ## Updates after device reboot
 
-Android cancels pending alarms when a device restarts. TimeFlow handles this automatically via `BootcompleteReceiver`, which listens for the `BOOT_COMPLETED` broadcast and reschedules all widget update alarms as soon as the device finishes booting.
+Android cancels pending alarms when a device restarts. TimeFlow handles this automatically via `BootCompleteReceiver`, which listens for the `BOOT_COMPLETED` broadcast and reschedules all widget update alarms as soon as the device finishes booting.
 
 ```kotlin
-// BootcompleteReceiver reschedules widget alarms on every device restart
-class BootcompleteReceiver : BroadcastReceiver() {
+// BootCompleteReceiver reschedules widget alarms on every device restart
+@AndroidEntryPoint
+class BootCompleteReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == Intent.ACTION_BOOT_COMPLETED) {
-            // Restart WidgetAlarmService to reschedule all widget updates
+            WidgetAlarmService(context).scheduleAlarmForUpdatingWidgets()
         }
     }
 }

@@ -67,13 +67,15 @@ data class Events(
 
 `TaskDao` and `EventDao` expose suspend functions and `Flow`-returning queries:
 
-- **Insert** — `@Insert(onConflict = OnConflictStrategy.REPLACE)`
-- **Update** — `@Update`
+- **Insert** — `@Insert` (fails on conflict)
+- **Update** — `@Upsert` (insert or replace)
 - **Delete** — `@Delete`
 - **Get all** — returns `Flow<List<T>>` so the UI reacts to database changes automatically
-- **Get for date range** — accepts `start: Long` and `end: Long` epoch values and returns matching rows
+- **Get for date range** — accepts `start: Long` and `end: Long` epoch values and returns rows where `createdAt BETWEEN start AND end`
 
 Date-range queries power both the "today" views and the calendar day detail views.
+
+`TaskDao` also exposes `getTaskForAlarm(start: Long)` which returns all tasks with `notification = 1` and `createdAt > start` — used by `BootCompleteReceiver` to reschedule alarms after a device reboot.
 
 ## Repository pattern
 
@@ -81,11 +83,11 @@ Each DAO is wrapped in a repository that the ViewModel depends on. Repositories 
 
 ### TaskRepo
 
-Delegates to `TaskDao` for insert, update, delete, and both date-range queries (`getAllTasksForDate`, `getTasksForToday`).
+Delegates to `TaskDao` for insert, update, delete, the `createdAt`-based date-range query (`getTaskForDate`), and `getTaskForAlarm` (used by `BootCompleteReceiver` to reschedule alarms after reboot).
 
 ### EventRepo
 
-Delegates to `EventDao` for insert, update, delete, and date-range queries (`getAllEventsForDate`, `getEventsForToday`).
+Delegates to `EventDao` for insert, update, delete, the `createdAt`-based date-range query (`getAllEventsForADate`), and `getEventsForNotification` (used by `BootCompleteReceiver` to reschedule event alarms).
 
 ### DataStoreRepo
 

@@ -7,7 +7,7 @@ TimeFlow delivers notifications using Android's **AlarmManager** — not Firebas
 
 ## How it works
 
-When you enable a notification on a task or event, TimeFlow creates a `NotificationAlarmManagerModel` and calls `TimeFlowAlarmManagerService.scheduleSingleAlarm()`. AlarmManager fires a broadcast at the specified `hour:minute` on the target date. `NotificationAlarmManagerReciever` handles that broadcast and shows the notification.
+When you enable a notification on a task or event, TimeFlow creates a `NotificationAlarmManagerModel` and calls `TimeFlowAlarmManagerService.scheduleSingleAlarm()`. AlarmManager fires a broadcast at the specified `hour:minute` on the target date. `NotificationAlarmManagerReceiver` handles that broadcast and shows the notification.
 
 ### Notification types
 
@@ -22,7 +22,7 @@ The type is set automatically based on whether you're creating a task or an even
 
 <Steps>
   <Step title="Open the add or edit sheet">
-    Tap the **FAB** and select **Add Task**, or tap an existing **TaskTile** to open **SheetToEditTask**.
+    Tap the **+** FAB on the **Calendar** screen and select **Task**, or tap an existing **TaskTile** to open **SheetToEditTask**.
   </Step>
   <Step title="Set a scheduled time">
     Tap the time picker and choose the date and time for the task (`taskTime`). The notification fires at this exact hour and minute.
@@ -55,12 +55,13 @@ Both are precise to the minute. TimeFlow does not batch or delay alarms.
 ## Alarm persistence after reboot
 
 <Info>
-  AlarmManager alarms are cleared when a device reboots. TimeFlow includes a `BootcompleteReceiver` that listens for the `BOOT_COMPLETED` broadcast and automatically reschedules all pending alarms when your device starts up. You don't need to take any action — your reminders are restored in the background.
+  AlarmManager alarms are cleared when a device reboots. TimeFlow includes a `BootCompleteReceiver` that listens for the `BOOT_COMPLETED` broadcast and automatically reschedules all pending alarms when your device starts up. You don't need to take any action — your reminders are restored in the background.
 </Info>
 
 ## What happens on reboot
 
 1. Device restarts and broadcasts `BOOT_COMPLETED`.
-2. `BootcompleteReceiver` receives the broadcast.
-3. All tasks and events with notifications enabled are re-queried from the local Room database.
-4. Alarms are rescheduled via `TimeFlowAlarmManagerService.scheduleSingleAlarm()` for any notification times that are still in the future.
+2. `BootCompleteReceiver` receives the broadcast.
+3. All tasks and events with notifications enabled are re-queried from the local Room database (using `getTaskForAlarm` and `getEventsForNotification`).
+4. Widget update alarms are rescheduled via `WidgetAlarmService`.
+5. Task and event alarms are rescheduled via `TimeFlowAlarmManagerService.scheduleNotification()` for any notification times that are still in the future.

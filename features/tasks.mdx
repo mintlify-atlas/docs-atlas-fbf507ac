@@ -36,8 +36,11 @@ The `importance` field controls how the task's priority badge appears in the **T
 ## Create a task
 
 <Steps>
+  <Step title="Open the calendar screen">
+    Tap **Calendar** in the bottom navigation bar to go to the calendar screen, which has the **+** floating action button.
+  </Step>
   <Step title="Open the add sheet">
-    Tap the **FAB** (floating action button) on any screen, then select **Add Task**. The **SheetToAddTaskAndEvent** bottom sheet opens.
+    Tap the **+** FAB. The **SheetToAddEventAndTask** bottom sheet opens. Select **Task** from the type selector at the top.
   </Step>
   <Step title="Enter the task name">
     Type a name in the **Name** field. This is the only required field.
@@ -65,7 +68,7 @@ Tap the **CheckBox** on a **TaskTile** to toggle `isCompleted`. Completed tasks 
 
 ## Edit a task
 
-Tap anywhere on a **TaskTile** (outside the checkbox) to open the **SheetToEditTask** bottom sheet. Edit any field and tap **Save** to persist the changes via `updateTask`.
+Tap anywhere on a **TaskTile** in the calendar view (outside the checkbox) to open the **SheetToEditTask** bottom sheet. Edit any field and tap **Save** to persist the changes via `updateTask`.
 
 ## Delete a task
 

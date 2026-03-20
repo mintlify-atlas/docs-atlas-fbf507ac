@@ -54,40 +54,33 @@ readCalendarType(): Flow<Int>
 
 When you tap a day in either view, the tasks and events scheduled for that day appear in a list below the calendar grid. Items are grouped so you can see tasks separately from events.
 
-## How to add a task from the calendar
+## How to add a task or event from the calendar
 
 <Steps>
   <Step title="Open the calendar screen">
-    Tap **Calendar** in the bottom navigation bar to open the calendar screen.
+    Tap **Calendar** (the Tasks icon) in the bottom navigation bar to open the calendar screen.
   </Step>
   <Step title="Navigate to the target date">
-    Swipe to the week or month containing the date you want to add a task to, then tap that day to select it.
+    Swipe to the week or month containing the date you want, then tap that day to select it.
   </Step>
   <Step title="Tap the FAB (+) button">
-    Tap the **+** floating action button in the bottom-right corner. A rounded menu (`RoundedFabMenu`) expands with two options.
+    Tap the **+** floating action button in the bottom-right corner. The `SheetToAddEventAndTask` bottom sheet opens.
   </Step>
-  <Step title="Choose Add task or Add event">
-    Select **Add task** to open the `AddTaskBottomSheet`, or **Add event** to open the event creation flow.
+  <Step title="Choose Event or Task">
+    At the top of the bottom sheet, select **Event** or **Task** using the type selector chips.
   </Step>
-  <Step title="Fill in the task details">
-    In the bottom sheet, enter the task name, set a priority (**High**, **Medium**, or **Low**), and confirm any date or time fields. The selected calendar date is pre-filled.
+  <Step title="Fill in the details">
+    Enter a name and (for tasks) choose a priority — **Low**, **Medium**, or **High**. For events, set a start and end date/time. Enable the notification toggle if you want a reminder.
   </Step>
-  <Step title="Save the task">
-    Tap **Save** (or the equivalent confirm action) to add the task. It immediately appears under the selected day in the calendar.
+  <Step title="Save">
+    Tap **Save**. The item is inserted into the database and appears under the selected day in the calendar immediately.
   </Step>
 </Steps>
 
 <Tip>
-  Tap a specific date before opening the FAB menu. The bottom sheet uses the selected date as the default, saving you from setting it manually.
+  Select a date in the calendar before tapping **+**. The bottom sheet defaults to the selected date, so you don't need to set the date manually.
 </Tip>
 
-## The FAB menu
+## The add sheet
 
-The `RoundedFabMenu` expands from the **+** button and presents two actions:
-
-| Action | What it opens |
-|--------|---------------|
-| **Add task** | `AddTaskBottomSheet` — a bottom sheet for creating a task |
-| **Add event** | Event creation flow for scheduling a calendar event |
-
-Tapping anywhere outside the expanded menu closes it without making a selection.
+Tapping **+** opens `SheetToAddEventAndTask` — a single combined bottom sheet that handles both tasks and events. A type selector at the top lets you switch between **Event** and **Task** mode before saving.
